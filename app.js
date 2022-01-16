@@ -4,16 +4,22 @@ const ctx = canvas.getContext("2d"); // context variable
 const colors = document.getElementsByClassName("jsColor");
 const range = document.getElementById("jsRange");
 const mode = document.getElementById("jsMode");
+const saveBtn = document.getElementById("jsSave");
+
+const DEFAULT_COLOR = "black";
+const CANVAS_SIZE = 700;
 
 let painting = false;
 let filling = false;
 
 //default setting
-canvas.width = 700;
-canvas.height = 700;
+canvas.width = CANVAS_SIZE;
+canvas.height = CANVAS_SIZE;
 
-ctx.strokeStyle = "black";
-ctx.fillStyle = "black";
+ctx.fillStyle = "white";
+ctx.fillRect(0, 0, canvas.width, canvas.height); // fill the background white.
+ctx.strokeStyle = DEFAULT_COLOR;
+ctx.fillStyle = DEFAULT_COLOR;
 ctx.lineWidth = 2.5;
 
 // function list
@@ -50,12 +56,32 @@ function handleRangeChange(event) {
 
 function handleModeClick(event) {
   if (filling) {
+    startPainting();
     filling = false; // paint mode
     mode.innerText = "Paint";
   } else {
+    stopPainting();
     filling = true; // fill mode
     mode.innerText = "Fill";
   }
+}
+
+function handleCanvasClick() {
+  if (filling) {
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+}
+
+function handleCM(event) {
+  event.preventDefault();
+}
+
+function handleSaveClick() {
+  const image = canvas.toDataURL("image/jpeg");
+  const link = document.createElement("a");
+  link.href = image;
+  link.download = "myPainting";
+  link.click();
 }
 
 // main
@@ -65,6 +91,8 @@ if (canvas) {
   canvas.addEventListener("mousedown", startPainting);
   canvas.addEventListener("mouseup", stopPainting);
   canvas.addEventListener("mouseleave", stopPainting);
+  canvas.addEventListener("click", handleCanvasClick);
+  canvas.addEventListener("contextmenu", handleCM);
 }
 
 // 2. change color
@@ -80,4 +108,8 @@ if (range) {
 // 4. set the paint mode
 if (mode) {
   mode.addEventListener("click", handleModeClick);
+}
+
+if (saveBtn) {
+  saveBtn.addEventListener("click", handleSaveClick);
 }
